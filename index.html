@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .chat-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* More rounded */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 70vh; /* Make chat window taller */
+            max-height: 90vh;
+        }
+        .chat-header {
+            background-color: #3b82f6; /* Blue 500 */
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: #f9fafb;
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1.25rem;
+            border-radius: 1.25rem; /* More rounded */
+            word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .user-message {
+            background-color: #e0f2fe; /* Light blue 100 */
+            align-self: flex-end;
+            border-bottom-right-radius: 0.5rem; /* Slight adjustment for visual appeal */
+            color: #1f2937;
+        }
+        .bot-message {
+            background-color: #ffffff;
+            align-self: flex-start;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 0.5rem; /* Slight adjustment */
+            color: #1f2937;
+        }
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+        .bot-message .message-timestamp {
+            text-align: left;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 1rem 1.5rem;
+            gap: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            border-bottom-left-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+        }
+        .chat-input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .chat-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .send-button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .send-button:hover {
+            background-color: #2563eb; /* Blue 600 */
+        }
+        .send-button:active {
+            transform: scale(0.98);
+        }
+        .loading-indicator {
+            text-align: center;
+            padding: 1rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+            display: none; /* Hidden by default */
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 640px) {
+            .chat-container {
+                min-height: 95vh;
+                border-radius: 0;
+            }
+            body {
+                padding: 0;
+            }
+            .chat-header {
+                border-radius: 0;
+            }
+            .chat-input-area {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path></svg>
+            AI Chatbot Support
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will be appended here -->
+            <div class="bot-message message-bubble">
+                Hi there! I'm your AI assistant. How can I help you today?
+                <div class="message-timestamp">Just now</div>
+            </div>
+        </div>
+        <div class="loading-indicator" id="loading-indicator">
+            <span class="spinner"></span> Typing...
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="user-input" class="chat-input" placeholder="Type your message here...">
+            <button id="send-button" class="send-button">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        // Generate a simple unique user ID for session tracking
+        const userId = localStorage.getItem('chatbotUserId') || `user_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('chatbotUserId', userId);
+
+        const API_BASE_URL = window.location.origin; // Dynamically get the base URL
+
+        function formatTimestamp(isoString) {
+            const date = new Date(isoString);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function addMessage(message, role, timestamp = new Date().toISOString()) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message-bubble', `${role}-message`);
+            messageElement.innerHTML = `
+                ${message}
+                <div class="message-timestamp">${formatTimestamp(timestamp)}</div>
+            `;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+        }
+
+        async function fetchChatHistory() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/history?userId=${userId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const history = await response.json();
+                // Clear initial bot message before loading history if it's not the only thing
+                if (history.length > 0) {
+                    chatMessages.innerHTML = '';
+                }
+
+                history.forEach(item => {
+                    addMessage(item.message, item.role, item.timestamp);
+                });
+            } catch (error) {
+                console.error('Error fetching chat history:', error);
+                // Optionally display an error message in the chat
+                addMessage("Failed to load chat history.", "bot");
+            }
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            showLoadingIndicator(true);
+            sendButton.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message, userId: userId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                addMessage(data.response, 'bot');
+            } catch (error) {
+                console.error('Error sending message:', error);
+                addMessage("Oops! Something went wrong. Please try again.", "bot");
+            } finally {
+                showLoadingIndicator(false);
+                sendButton.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function showLoadingIndicator(show) {
+            loadingIndicator.style.display = show ? 'block' : 'none';
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Fetch history when the page loads
+        window.onload = fetchChatHistory;
+    </script>
+</body>
+</html>
