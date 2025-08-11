@@ -48,3 +48,10 @@ Built with Flask, Sentence Transformers, and TailwindCSS for a sleek, responsive
 5️⃣ Open in your browser
 
     http://127.0.0.1:5000
+
+📸 Screenshot
+
+<img width="1536" height="1024" alt="AI-chatbot-img" src="https://github.com/user-attachments/assets/2000eaf0-f942-4428-b53e-4731e79bf970" />
+
+
+If you like this project, ⭐ star it on GitHub to support more AI experiments!
